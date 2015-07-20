@@ -53,15 +53,16 @@ void Wick::Bitset::setBits(unsigned int aBitIndex, BlockType aBits, unsigned int
 		throw std::invalid_argument("setBits:The index plus the length exceeds to bitset length");
 	}
 		
-	unsigned int myBlockIndex = aBitIndex / theBlockSize;
-	int myEndBit = (aBitIndex % theBlockSize) + aLength - theBlockSize;
+	unsigned int myStartBlockIndex = aBitIndex / theBlockSize;
+	unsigned int myEndBlockIndex = (aBitIndex + aLength) / theBlockSize;
+	int myEndBit = (aBitIndex + aLength) % theBlockSize;
 	BlockType myMask = theMaxBlockValue; // 11111111
 		
-	if(myEndBit > 0) {
+	if(myStartBlockIndex != myEndBlockIndex) {
 		// clear the data in the area that we're going to read data into
-		theInner[myBlockIndex + 1] &= (theMaxBlockValue >> myEndBit);
+		theInner[myEndBlockIndex] &= (theMaxBlockValue >> myEndBit);
 		// set the bits in the spill over area
-		theInner[myBlockIndex + 1] |= (aBits << (aLength - myEndBit));
+		theInner[myEndBlockIndex] |= (aBits << (aLength - myEndBit));
 	} else {
 		// leave an empty space at the end of the mask for data left in the byte
 		myMask <<= theBlockSize - aLength;
@@ -70,9 +71,9 @@ void Wick::Bitset::setBits(unsigned int aBitIndex, BlockType aBits, unsigned int
 	// shift the mask to the starting position of the clear
 	myMask >>= (aBitIndex % theBlockSize);
 	// clear the data in the area we're about to read data into
-	theInner[myBlockIndex] &= ~myMask;
+	theInner[myStartBlockIndex] &= ~myMask;
 	// read in the data in the starting block
-	theInner[myBlockIndex] |= (aBits >> (aBitIndex % theBlockSize));	
+	theInner[myStartBlockIndex] |= (aBits >> (aBitIndex % theBlockSize));	
 }
 
 void Wick::Bitset::clearBits(unsigned int aBitIndex, unsigned int aLength) {
@@ -109,7 +110,7 @@ void Wick::Bitset::clearBits(unsigned int aBitIndex, unsigned int aLength) {
 	theInner[myStartBlockIndex] &= ~myMask;
 }
 
-Wick::BlockType Wick::Bitset::getBlock(unsigned int aBlockIndex) {
+Wick::Bitset::BlockType Wick::Bitset::getBlock(unsigned int aBlockIndex) {
 	return theInner[aBlockIndex];
 }
 

@@ -4,11 +4,11 @@
 #include <climits>
 
 namespace Wick {
-	
-	typedef unsigned char BlockType;
-	
+		
 	class Bitset {
 		public:
+			typedef unsigned char BlockType;
+		
 			Bitset(unsigned int aLength);
 			
 			void setBit(unsigned int aBitIndex, bool aVal);
