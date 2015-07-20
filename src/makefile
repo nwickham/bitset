@@ -1,21 +1,29 @@
+# simple makefile, hopefully that can be used for later projects
+# set compiler
 CC=g++
-WARN=-Wall -W -g
+# set flags
+DEBUG=-g
+WARN=-Wall -W
 STD=-std=c++11
-CFLAGS=$(WARN) $(STD)
-MAIN=main
-SRCS=main.cpp bitset.cpp
-
+CFLAGS=$(WARN) $(DEBUG) $(STD) -c
+LFLAGS=$(WARN) $(DEBUG)
+# set environment
+BINDIR=../
+NAME=main
+EXE=$(BINDIR)$(NAME)
+EXT=cpp
+SRCS=$(shell find . -name "*.$(EXT)")
 OBJS=$(SRCS:.cpp=.o)
 
 .PHONY: clean
 
-all: $(MAIN)
+all: $(EXE)
 
-$(MAIN): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(MAIN)
+$(EXE): $(OBJS)
+	$(CC) $(LFLAGS) $(OBJS) -o $@
 	
 .cpp.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $<
 	
 clean:
-	$(RM) *.o $(MAIN)
+	$(RM) *.o $(EXE)
