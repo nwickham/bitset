@@ -17,12 +17,13 @@ namespace Wick {
 			void setBits(unsigned int aBitIndex, BlockType aBits, unsigned int aLength);
 			void clearBits(unsigned int aBitIndex, unsigned int aLength);
 			
-			unsigned char getBlock(unsigned int aBlockIndex);
-			unsigned char* get();
+			BlockType getBlock(unsigned int aBlockIndex);
+			void get(BlockType** aData, unsigned int& aLength);
 			
 		private:		
 			std::unique_ptr<BlockType[]> theInner;
 			unsigned int theLength;
+			unsigned int theBlockCount;
 			
 			static const unsigned int theBitsPerByte = 8;
 			static const unsigned int theBlockSize = sizeof(BlockType) * theBitsPerByte;

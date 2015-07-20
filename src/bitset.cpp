@@ -1,15 +1,16 @@
 #include "bitset.h"
 
 #include <stdexcept>
+#include <cstring>
 
 Wick::Bitset::Bitset(unsigned int aLength) {
-	unsigned int aBytes = aLength / theBlockSize;
+	theBlockCount = aLength / theBlockSize;
 	
 	if( aLength % theBlockSize != 0) {
-		aBytes += 1;
+		theBlockCount += 1;
 	}
 	
-	theInner = std::unique_ptr<BlockType[]>(new BlockType[aBytes]);
+	theInner = std::unique_ptr<BlockType[]>(new BlockType[theBlockCount]);
 	theLength = aLength;
 }
 
@@ -54,7 +55,7 @@ void Wick::Bitset::setBits(unsigned int aBitIndex, BlockType aBits, unsigned int
 		
 	unsigned int myBlockIndex = aBitIndex / theBlockSize;
 	int myEndBit = (aBitIndex % theBlockSize) + aLength - theBlockSize;
-	Wick::BlockType myMask = theMaxBlockValue; // 11111111
+	BlockType myMask = theMaxBlockValue; // 11111111
 		
 	if(myEndBit > 0) {
 		// clear the data in the area that we're going to read data into
@@ -108,6 +109,17 @@ void Wick::Bitset::clearBits(unsigned int aBitIndex, unsigned int aLength) {
 	theInner[myStartBlockIndex] &= ~myMask;
 }
 
-unsigned char Wick::Bitset::getBlock(unsigned int aBlockIndex) {
+Wick::BlockType Wick::Bitset::getBlock(unsigned int aBlockIndex) {
 	return theInner[aBlockIndex];
+}
+
+void Wick::Bitset::get(BlockType** aData, unsigned int& aLength) {
+	BlockType* myInner = new BlockType[theBlockCount];
+	
+	// copy inner array to new array to be returned
+	std::memcpy(myInner, theInner.get(), theBlockCount);
+	
+	// hand off memory
+	*aData = myInner;
+	aLength = theBlockCount;
 }
